@@ -1,0 +1,93 @@
+import mysql.connector
+
+
+class Employee_Management:
+
+    def __init__(self):
+        try:
+            self.Database_Connection = mysql.connector.connect(host="127.0.0.1", user="root", password="1234",
+                                                               database="own")
+            cursor = self.Database_Connection.cursor()
+            print("Database Updated successfully")
+        except Exception as error:
+            print("Failed".format(error))
+
+    def Add_Employee(self):
+        employee_id = input("Enter Employee Id : ")
+        First_Name = input("Enter Employee Trigram : ")
+        Last_Name = input("Enter Employee Name: ")
+        Designation = input("Enter Employee Designation : ")
+        Salary = input("Enter Employee Salary : ")
+        data = [employee_id, First_Name, Last_Name, Designation, Salary]
+        Query_sql = f'insert into file(EMPLOYEE_ID, TRIGRAM, EMPLOYEE_NAME, DESIGNATION, SALARY) values(%s,%s,%s,%s,%s)'
+        c = self.Database_Connection.cursor()
+        c.execute(Query_sql, data)
+        self.Database_Connection.commit()
+        print("Employee Added Successfully ")
+
+    def Promotion_Employee(self):
+        employee_id = int(input("Enter Employee Id"))
+        Amount = int(input("Enter increase in Employee Salary"))
+        Query_sql = f'select salary from file where EMPLOYEE_ID={employee_id}'
+        c = self.Database_Connection.cursor()
+        c.execute(Query_sql)
+        Fetch = c.fetchone()
+        Store = Fetch[0] + Amount
+        Query_sql = f'update file set SALARY={Store} where EMPLOYEE_ID={employee_id}'
+        c.execute(Query_sql)
+        self.Database_Connection.commit()
+        print("Employee Promoted")
+
+    def Remove_Employee(self):
+        employee_id = input("Enter Employee Id : ")
+        Query_sql = 'delete from own.file where EMPLOYEE_ID=%s'
+        data = (employee_id,)
+        c = self.Database_Connection.cursor()
+        c.execute(Query_sql, data)
+        self.Database_Connection.commit()
+        print("Employee Removed")
+
+    def Display_Employees(self):
+        Query_sql = 'select * from own.file'
+        c = self.Database_Connection.cursor()
+        c.execute(Query_sql)
+        Details = c.fetchall()
+        for i in Details:
+            print("Employee EMPLOYEE_ID : ", i[0])
+            print("Employee TRIGRAM : ", i[1])
+            print("Employee EMPLOYEE_NAME : ", i[2])
+            print("Employee DESIGNATION : ", i[3])
+            print("Employee SALARY : ", i[4])
+            print("---------------------\
+            -----------------------------\
+            ------------------------------\
+            ---------------------")
+        Choices()
+
+
+def Choices():
+    while True:
+        obj1 = Employee_Management()
+        print("\n\n   Welcome to Employee Management Record")
+        print("\n    Enter Your Choices: ")
+        print("\n1 To Add Employee")
+        print("\n2 To Remove Employee ")
+        print("\n3 To Promote Employee")
+        print("\n4 To Display Employees")
+        print("\n5 To Exit")
+        choice = int(input("\nEnter your Choice: "))
+        if choice == 1:
+            obj1.Add_Employee()
+        elif choice == 2:
+            obj1.Remove_Employee()
+        elif choice == 3:
+            obj1.Promotion_Employee()
+        elif choice == 4:
+            obj1.Display_Employees()
+        elif choice == 5:
+            break
+        else:
+            print("Invalid Choice")
+
+
+Choices()
